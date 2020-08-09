@@ -1,0 +1,30 @@
+{
+  "name": "treact",
+  "version": "1.0.0",
+  "description": "Reimplement react with typescript",
+  "main": "dist/index.js",
+  "author": "Anton Bortnikov <6088046+ntnbrtnkv@users.noreply.github.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup --config",
+    "start": "rollup --config -w",
+    "build:types": "tsc --project tsconfig.types.json",
+    "test": "jest",
+    "lint": "prettier --check .",
+    "type-check": "tsc --noEmit ./src/index.ts",
+    "lint:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.1",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-typescript": "^7.10.4",
+    "@rollup/plugin-babel": "^5.1.0",
+    "@rollup/plugin-node-resolve": "^8.4.0",
+    "@types/jest": "^26.0.9",
+    "babel-jest": "^26.2.2",
+    "jest": "^26.2.2",
+    "prettier": "^2.0.5",
+    "rollup": "^2.23.1",
+    "typescript": "^3.9.7"
+  }
+}

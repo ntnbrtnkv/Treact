@@ -1,2 +1,9 @@
-export { default as createElement } from './createElement';
-export { default as render } from './render';
+import { default as createElement } from './createElement';
+import { default as render } from './render';
+
+const Treact = {
+  createElement,
+  render,
+};
+
+export default Treact;

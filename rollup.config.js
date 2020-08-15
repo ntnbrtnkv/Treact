@@ -14,6 +14,7 @@ const config = {
     {
       format: 'cjs',
       file: 'dist/index.js',
+      exports: 'default',
     },
   ],
   plugins: [

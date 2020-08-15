@@ -1,6 +1,5 @@
-// import Treact from 'treact';
-// import { render } from 'treact';
+import Treact, { render } from 'treact';
 
-const App = <div>test</div>;
+const App = <h1>test</h1>;
 
-Treact.render(<App />, document.getElementById('root'));
+render(App, document.getElementById('root'));

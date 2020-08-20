@@ -2,13 +2,6 @@ export type Type = 'TEXT_ELEMENT' | string;
 
 export type Props = Object;
 
-export type Node = {
-  type: Type;
-  props: {
-    children: Node[];
-  };
-};
-
 export type TextNode = {
   type: 'TEXT_ELEMENT';
   props: {
@@ -16,3 +9,13 @@ export type TextNode = {
     children: Node[];
   };
 };
+
+export type Node =
+  | TextNode
+  | {
+      type: Type;
+      props: {
+        children: Node[];
+        [key: string]: any;
+      };
+    };

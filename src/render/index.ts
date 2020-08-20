@@ -2,7 +2,7 @@ import { Node } from '../types';
 
 const IGNORE_PROPS = ['children'];
 
-export default function render(element: Node, container: HTMLElement | Text) {
+function _render(element: Node, container: HTMLElement | Text) {
   let domElement: HTMLElement | Text;
 
   switch (element.type) {
@@ -14,14 +14,19 @@ export default function render(element: Node, container: HTMLElement | Text) {
   }
 
   Object.keys(element.props)
-    .filter((k) => !IGNORE_PROPS.includes(k))
+    .filter((prop) => !IGNORE_PROPS.includes(prop))
     .forEach((name) => {
-      domElement[name] = element.props[name];
+      (domElement as any)[name] = element.props[name];
     });
 
   element.props.children.forEach((child) => {
-    render(child, domElement);
+    _render(child, domElement);
   });
 
   container.appendChild(domElement);
+}
+
+export default function (element: Node, container: HTMLElement | null) {
+  if (container === null) return;
+  _render(element, container);
 }

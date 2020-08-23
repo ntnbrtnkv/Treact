@@ -19,3 +19,15 @@ export type Node =
         [key: string]: any;
       };
     };
+
+export type Fiber = Node & {
+  dom: HTMLElement | Text | null;
+  sibling?: Fiber;
+  child?: Fiber;
+  parent: Fiber;
+  alternate?: Fiber | null;
+  effectTag?: 'UPDATE' | 'PLACEMENT' | 'DELETION';
+  props: {
+    children: Fiber[];
+  };
+};

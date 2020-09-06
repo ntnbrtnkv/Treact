@@ -6,11 +6,13 @@ function updateValue(e) {
   renderer(e.target.value);
 }
 
+const Hello = ({ name }) => <h2>Hello {name}</h2>;
+
 function renderer(value) {
   const elem = (
     <div>
       <input onInput={updateValue} value={value} />
-      <h2>Hello {value}</h2>
+      <Hello name={value} />
     </div>
   );
 

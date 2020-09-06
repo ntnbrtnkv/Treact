@@ -1,4 +1,4 @@
-import { Node, Fiber } from '../types';
+import { Fiber, Node } from '../types';
 
 const IGNORE_PROPS = ['children'];
 
@@ -63,13 +63,25 @@ function reconcileChildren(wipFiber: Fiber, elements) {
   }
 }
 
-function performUnitOfWork(fiber: Fiber): Fiber {
+function updateFunctionComponent(fiber: Fiber) {
+  const children = [fiber.type(fiber.props)];
+  reconcileChildren(fiber, children);
+}
+
+function updateHostComponent(fiber: Fiber) {
   if (!fiber.dom) {
     fiber.dom = createDom(fiber);
   }
 
-  const elements = fiber.props.children;
-  reconcileChildren(fiber, elements);
+  reconcileChildren(fiber, fiber.props.children);
+}
+
+function performUnitOfWork(fiber: Fiber): Fiber {
+  if (fiber.type instanceof Function) {
+    updateFunctionComponent(fiber);
+  } else {
+    updateHostComponent(fiber);
+  }
 
   if (fiber.child) {
     return fiber.child;
@@ -125,17 +137,31 @@ function updateDom(dom: HTMLElement, prevProps, nextProps) {
     });
 }
 
+function commitDeletion(fiber: Fiber, domParent: HTMLElement) {
+  if (fiber.dom) {
+    domParent.removeChild(fiber.dom);
+  } else {
+    commitDeletion(fiber.child, domParent);
+  }
+}
+
 function commitWork(fiber: Fiber | null) {
   if (!fiber) {
     return;
   }
-  const domParent = fiber.parent.dom;
+
+  let domParentFiber = fiber.parent;
+  while (!domParentFiber.dom) {
+    domParentFiber = domParentFiber.parent;
+  }
+  const domParent = domParentFiber.dom;
+
   if (fiber.effectTag === 'PLACEMENT' && fiber.dom != null) {
     domParent?.appendChild(fiber.dom);
   } else if (fiber.effectTag === 'UPDATE' && fiber.dom != null) {
     updateDom(fiber.dom, fiber.alternate.props, fiber.props);
   } else if (fiber.effectTag === 'DELETION') {
-    domParent?.removeChild(fiber.dom);
+    commitDeletion(fiber, domParent);
   }
   commitWork(fiber.child);
   commitWork(fiber.sibling);
@@ -143,7 +169,7 @@ function commitWork(fiber: Fiber | null) {
 
 function workLoop(deadline: IdleDeadline) {
   let shouldYield = false;
-  // console.log(nextUnitOfWork, wipRoot);
+
   while (nextUnitOfWork && !shouldYield) {
     nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
     shouldYield = deadline.timeRemaining() < 1;

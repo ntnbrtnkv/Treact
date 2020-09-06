@@ -6,6 +6,8 @@ let nextUnitOfWork: Fiber | null = null;
 let wipRoot: Fiber | null = null;
 let currentRoot: Fiber | null = null;
 let deletions: Fiber[] | null = null;
+let wipFiber: Fiber | null = null;
+let hookIndex: number | null = null;
 
 const isEvent = (key: string) => key.startsWith('on');
 const isProp = (key: string) => !IGNORE_PROPS.includes(key) && !isEvent(key);
@@ -64,8 +66,40 @@ function reconcileChildren(wipFiber: Fiber, elements) {
 }
 
 function updateFunctionComponent(fiber: Fiber) {
+  wipFiber = fiber;
+  hookIndex = 0;
+  wipFiber.hooks = [];
   const children = [fiber.type(fiber.props)];
   reconcileChildren(fiber, children);
+}
+
+export function useState(initial: any) {
+  const oldHook = wipFiber?.alternate?.hooks[hookIndex];
+  const hook = {
+    state: oldHook ? oldHook.state : initial,
+    queue: [],
+  };
+
+  const actions = oldHook ? oldHook.queue : [];
+
+  actions.forEach((action) => {
+    hook.state = action(hook.state);
+  });
+
+  const setState = (action) => {
+    hook.queue.push(action);
+    wipRoot = {
+      dom: currentRoot?.dom,
+      props: currentRoot?.props,
+      alternate: currentRoot,
+    };
+    nextUnitOfWork = wipRoot;
+    deletions = [];
+  };
+
+  wipFiber?.hooks?.push(hook);
+  hookIndex++;
+  return [hook.state, setState];
 }
 
 function updateHostComponent(fiber: Fiber) {

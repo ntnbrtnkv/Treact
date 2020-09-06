@@ -25,6 +25,7 @@ export type Fiber = Node & {
   sibling?: Fiber;
   child?: Fiber;
   parent: Fiber;
+  hooks?: any[];
   alternate?: Fiber | null;
   effectTag?: 'UPDATE' | 'PLACEMENT' | 'DELETION';
   props: {
